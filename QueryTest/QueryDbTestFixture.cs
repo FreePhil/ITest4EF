@@ -1,5 +1,6 @@
 ﻿using DotNet.Testcontainers.Builders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RelatedToOneEntity.DbContexts;
 using Testcontainers.MySql;
 
@@ -23,8 +24,14 @@ public class QueryDbTestFixture: IAsyncLifetime
             .Build();
         
         await container.StartAsync();
+
+        var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole();
+        });
         this.Options = new DbContextOptionsBuilder<TestDbContext>()
             .UseMySQL(container.GetConnectionString())
+            .UseLoggerFactory(loggerFactory)
             .Options;
     }
 
